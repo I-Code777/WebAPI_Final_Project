@@ -28,7 +28,7 @@ The front end will feature a Kanban-style board using libraries like react-beaut
 -A user authentication system (login/logout)
 -A task-sharing interface, allowing users to share tasks with others and view/edit tasks that have been shared with them
 
-###Database:
+### Database:
 The database will consist of two main collections:
 
 -Users Collection – Stores user authentication details, including email, hashed password, and profile information.
