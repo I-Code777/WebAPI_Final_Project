@@ -5,6 +5,13 @@ This repository is used for my Web API final project.
 Project Name: Task Management Tool
 Members: Jessica Nguyen
 
+### Tools Used
+-MongoDB Atlas (web browser based platform)
+-Render
+-GitHub
+-CodeSandbox REACT app template (web browswer based platform)
+Notice: Most of the tools I use are mainly web browser based since my laptop struggles with any downloaded applications.
+
 ### High-Level Concept:
 A task management application that allows users to create, categorize, and track their tasks efficiently. The tool will provide user authentication, task prioritization, and notifications for overdue tasks, ensuring better productivity and organization. This project base has been taken from Chapter 22 of the provided textbook.
 
