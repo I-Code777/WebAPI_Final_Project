@@ -10,6 +10,7 @@ Members: Jessica Nguyen
 -Render
 -GitHub
 -CodeSandbox REACT app template (web browswer based platform)
+-Postman
 Notice: Most of the tools I use are mainly web browser based since my laptop struggles with any downloaded applications.
 
 ### High-Level Concept:
