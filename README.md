@@ -1,5 +1,5 @@
 # WebAPI_Final_Project
-This repository is used for my Web API final project.
+This repository is used for my Web API final project. Parts of this project has taken code segments of previous assignments to base on, and online resources in my research to build this project.
 
 ## Outline of Project
 Project Name: Task Management Tool
@@ -48,4 +48,7 @@ The database will consist of two main collections:
 -Notifications for overdue tasks
 -Shared users – A list of user IDs that have access to the task
 
-This project aims to provide an intuitive and collaborative task management experience, ensuring users can effectively organize and track their daily tasks while allowing for seamless teamwork.
+
+## Links to Eternal Sources
+REACT App (powered by CodeSandBox): https://codesandbox.io/p/sandbox/stoic-sound-5kn7fk?file=%2Fsrc%2Findex.js%3A10%2C46
+Postman:
