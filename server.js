@@ -21,6 +21,8 @@ mongoose.connect('mongodb+srv://test:test123@webapifinal.l5sjtry.mongodb.net/web
   useUnifiedTopology: true,
 });
 
+const SECRET_KEY = process.env.SECRET_KEY;
+
 mongoose.connection.on('connected', () => {
   console.log('Mongoose connected to MongoDB');
 });
