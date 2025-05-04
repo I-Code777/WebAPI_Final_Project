@@ -1,10 +1,12 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const passport = require('passport');
-const authJwtController = require('./auth_jwt');
 const jwt = require('jsonwebtoken');
 const cors = require('cors');
-const User = require('./Users');
+const mongoose = require('mongoose');
+const User = require('./models/User');
+const Task = require('./models/Task'); // Import Task model
+const authJwtController = require('./auth_jwt'); // JWT auth middleware
 
 const app = express();
 app.use(cors());
@@ -13,34 +15,23 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 app.use(passport.initialize());
 
+// MongoDB connection (mongoose)
+mongoose.connect('mongodb+srv://test:<db_password>@webapifinal.l5sjtry.mongodb.net/webapifinal', {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
+
+mongoose.connection.on('connected', () => {
+  console.log('Mongoose connected to MongoDB');
+});
+
+mongoose.connection.on('error', (err) => {
+  console.log('Mongoose connection error:', err);
+});
+
 const router = express.Router();
 
-// Connect to MongoDB
-const { MongoClient, ServerApiVersion } = require('mongodb');
-const uri = "mongodb+srv://test:<db_password>@webapifinal.l5sjtry.mongodb.net/?retryWrites=true&w=majority&appName=WebAPIFinal";
-// Create a MongoClient with a MongoClientOptions object to set the Stable API version
-const client = new MongoClient(uri, {
-  serverApi: {
-    version: ServerApiVersion.v1,
-    strict: true,
-    deprecationErrors: true,
-  }
-});
-async function run() {
-  try {
-    // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
-    // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
-    console.log("Pinged your deployment. You successfully connected to MongoDB!");
-  } finally {
-    // Ensures that the client will close when you finish/error
-    await client.close();
-  }
-}
-run().catch(console.dir);
-
-// SIGNUP ROUTE
+// SIGNUP ROUTE (Create a new user)
 router.post('/signup', async (req, res) => {
   if (!req.body.username || !req.body.password) {
     return res.status(400).json({ success: false, msg: 'Please include both username and password to signup.' });
@@ -65,7 +56,7 @@ router.post('/signup', async (req, res) => {
   }
 });
 
-// SIGNIN ROUTE
+// SIGNIN ROUTE (Authenticate and provide JWT token)
 router.post('/signin', async (req, res) => {
   try {
     const user = await User.findOne({ username: req.body.username }).select('name username password');
@@ -86,6 +77,92 @@ router.post('/signin', async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ success: false, message: 'Something went wrong. Please try again later.' });
+  }
+});
+
+// TASK CRUD ROUTES
+
+// Create a new task
+router.post('/tasks', authJwtController.isAuthenticated, async (req, res) => {
+  try {
+    const newTask = new Task({
+      name: req.body.name,
+      description: req.body.description,
+      dueDate: req.body.dueDate,
+      priority: req.body.priority,
+      sharedWith: req.body.sharedWith,
+      category: req.body.category,
+      createdBy: req.user.id, // JWT user ID
+    });
+
+    await newTask.save();
+    res.status(201).json({ success: true, task: newTask });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: 'Failed to create task.' });
+  }
+});
+
+// Get all tasks for a user
+router.get('/tasks', authJwtController.isAuthenticated, async (req, res) => {
+  try {
+    const tasks = await Task.find({ createdBy: req.user.id });
+    res.status(200).json({ success: true, tasks });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: 'Failed to fetch tasks.' });
+  }
+});
+
+// Update a task
+router.put('/tasks/:id', authJwtController.isAuthenticated, async (req, res) => {
+  try {
+    const task = await Task.findById(req.params.id);
+
+    if (!task) {
+      return res.status(404).json({ success: false, message: 'Task not found.' });
+    }
+
+    // Ensure the task belongs to the user trying to update it
+    if (task.createdBy.toString() !== req.user.id) {
+      return res.status(403).json({ success: false, message: 'You are not authorized to update this task.' });
+    }
+
+    // Update task properties
+    task.name = req.body.name || task.name;
+    task.description = req.body.description || task.description;
+    task.dueDate = req.body.dueDate || task.dueDate;
+    task.priority = req.body.priority || task.priority;
+    task.sharedWith = req.body.sharedWith || task.sharedWith;
+    task.category = req.body.category || task.category;
+
+    await task.save();
+    res.status(200).json({ success: true, task });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: 'Failed to update task.' });
+  }
+});
+
+// Delete a task
+router.delete('/tasks/:id', authJwtController.isAuthenticated, async (req, res) => {
+  try {
+    const task = await Task.findById(req.params.id);
+
+    if (!task) {
+      return res.status(404).json({ success: false, message: 'Task not found.' });
+    }
+
+    // Ensure the task belongs to the user trying to delete it
+    if (task.createdBy.toString() !== req.user.id) {
+      return res.status(403).json({ success: false, message: 'You are not authorized to delete this task.' });
+    }
+
+    await task.remove();
+    res.status(200).json({ success: true, message: 'Task deleted successfully.' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: 'Failed to delete task.' });
   }
 });
 
