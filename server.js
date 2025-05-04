@@ -16,7 +16,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(passport.initialize());
 
 // MongoDB connection (mongoose)
-mongoose.connect('mongodb+srv://test:<db_password>@webapifinal.l5sjtry.mongodb.net/webapifinal', {
+mongoose.connect('mongodb+srv://test:test123@webapifinal.l5sjtry.mongodb.net/webapifinal', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
