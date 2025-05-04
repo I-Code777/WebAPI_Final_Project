@@ -4,8 +4,8 @@ const passport = require('passport');
 const jwt = require('jsonwebtoken');
 const cors = require('cors');
 const mongoose = require('mongoose');
-const User = require('./models/User');
-const Task = require('./models/Task'); // Import Task model
+const User = require('./User');
+const Task = require('./Task'); // Import Task model
 const authJwtController = require('./auth_jwt'); // JWT auth middleware
 
 const app = express();
