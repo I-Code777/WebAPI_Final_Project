@@ -15,6 +15,20 @@ app.use(passport.initialize());
 
 const router = express.Router();
 
+// Connect to MongoDB
+mongoose.connect('your-mongo-uri-here', {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => console.log('MongoDB connected'))
+  .catch((err) => console.error(err));
+  
+  // Middleware
+  app.use(cors());
+  app.use(bodyParser.json());
+  app.use(bodyParser.urlencoded({ extended: false }));
+  app.use(passport.initialize());
+
 // SIGNUP ROUTE
 router.post('/signup', async (req, res) => {
   if (!req.body.username || !req.body.password) {
