@@ -1,4 +1,6 @@
+console.log("Starting server.js...");
 require('dotenv').config();
+console.log("dotenv loaded");
 const express = require('express');
 const bodyParser = require('body-parser');
 const passport = require('passport');
