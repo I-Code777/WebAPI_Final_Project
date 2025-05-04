@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
 const passport = require('passport');
@@ -12,11 +13,12 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use(passport.initialize());
 
 app.use(passport.initialize());
 
 // MongoDB connection (mongoose)
-mongoose.connect('mongodb+srv://test:test123@webapifinal.l5sjtry.mongodb.net/webapifinal', {
+mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
@@ -232,5 +234,10 @@ router.delete('/tasks/:id', authJwtController.isAuthenticated, async (req, res) 
 
 // MOUNT ROUTER & EXPORT APP
 app.use('/api', router);
+
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
 
 module.exports = app;
