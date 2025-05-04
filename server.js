@@ -80,7 +80,69 @@ router.post('/signin', async (req, res) => {
   }
 });
 
-// TASK CRUD ROUTES
+// USER CRUD ROUTES=====================================================================================================================
+// USER CRUD ROUTES
+
+// Get User Profile
+router.get('/user', authJwtController.isAuthenticated, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select('-password');
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found.' });
+    }
+    res.status(200).json({ success: true, user });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: 'Failed to fetch user profile.' });
+  }
+});
+
+// Update User Profile
+router.put('/user', authJwtController.isAuthenticated, async (req, res) => {
+  const { name, password } = req.body;
+
+  if (!name && !password) {
+    return res.status(400).json({ success: false, message: 'Please provide at least one field to update (name or password).' });
+  }
+
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found.' });
+    }
+
+    if (name) user.name = name;
+    if (password) user.password = await user.hashPassword(password); // assuming you have a hashPassword method
+
+    await user.save();
+    res.status(200).json({ success: true, message: 'User profile updated successfully.', user });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: 'Failed to update user profile.' });
+  }
+});
+
+// Delete User Account
+router.delete('/user', authJwtController.isAuthenticated, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found.' });
+    }
+
+    // Delete associated tasks before deleting the user (optional)
+    await Task.deleteMany({ createdBy: req.user.id });
+
+    // Delete the user
+    await user.remove();
+    res.status(200).json({ success: true, message: 'User account deleted successfully.' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: 'Failed to delete user account.' });
+  }
+});
+
+// TASK CRUD ROUTES=====================================================================================================================
 
 // Create a new task
 router.post('/tasks', authJwtController.isAuthenticated, async (req, res) => {
